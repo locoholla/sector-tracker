@@ -1,17 +1,82 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <title>NASDAQ Sector Tracker</title>
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      text-align: center;
+    }
+    .sector {
+      margin: 20px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #222;
+    }
+    tr:nth-child(even) {
+      background: #1a1a1a;
+    }
+    .pos { color: #4CAF50; }
+    .neg { color: #F44336; }
+  </style>
 </head>
-<body style="margin:0;padding:0;background:#000;">
-  <iframe 
-    src="https://s.tradingview.com/embed-widget/market-overview/?locale=en#%7B%22colorTheme%22%3A%22dark%22%2C%22dateRange%22%3A%221D%22%2C%22showChart%22%3Atrue%2C%22width%22%3A%22100%25%22%2C%22height%22%3A%22600%22%2C%22tabs%22%3A%5B%7B%22title%22%3A%22Technology%22%2C%22symbols%22%3A%5B%7B%22s%22%3A%22NASDAQ%3AAAPL%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AMSFT%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AGOOG%22%7D%2C%7B%22s%22%3A%22NASDAQ%3ANVDA%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AADBE%22%7D%5D%7D%2C%7B%22title%22%3A%22Financials%22%2C%22symbols%22%3A%5B%7B%22s%22%3A%22NASDAQ%3APYPL%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AINTU%22%7D%2C%7B%22s%22%3A%22NASDAQ%3ASQ%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AHOOD%22%7D%2C%7B%22s%22%3A%22NASDAQ%3ASOFI%22%7D%5D%7D%2C%7B%22title%22%3A%22Healthcare%22%2C%22symbols%22%3A%5B%7B%22s%22%3A%22NASDAQ%3AAMGN%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AGILD%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AVRTX%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AREGN%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AILMN%22%7D%5D%7D%5D%7D" 
-    style="border:none;" 
-    width="100%" 
-    height="600" 
-    frameborder="0"
-    allowtransparency="true">
-  </iframe>
+<body>
+  <h1>NASDAQ Sector Tracker</h1>
+  <div id="container"></div>
+
+  <script>
+    // Define sectors with tickers
+    const sectors = {
+      "Technology": ["AAPL", "MSFT", "NVDA", "GOOG", "ADBE"],
+      "Financials": ["PYPL", "INTU", "SQ", "HOOD", "SOFI"],
+      "Healthcare": ["AMGN", "GILD", "VRTX", "REGN", "ILMN"]
+    };
+
+    async function fetchData() {
+      document.getElementById("container").innerHTML = "";
+      for (let [sector, tickers] of Object.entries(sectors)) {
+        let url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${tickers.join(",")}`;
+        try {
+          let res = await fetch(url);
+          let data = await res.json();
+          let quotes = data.quoteResponse.result;
+
+          let html = `<div class="sector"><h2>${sector}</h2><table>
+                        <tr><th>Symbol</th><th>Price</th><th>Change %</th></tr>`;
+          quotes.forEach(q => {
+            let change = q.regularMarketChangePercent?.toFixed(2);
+            let cls = change >= 0 ? "pos" : "neg";
+            html += `<tr>
+                      <td>${q.symbol}</td>
+                      <td>${q.regularMarketPrice}</td>
+                      <td class="${cls}">${change}%</td>
+                    </tr>`;
+          });
+          html += "</table></div>";
+
+          document.getElementById("container").innerHTML += html;
+        } catch (err) {
+          console.error("Error fetching data for", sector, err);
+        }
+      }
+    }
+
+    fetchData();
+    setInterval(fetchData, 60000); // update every 60s
+  </script>
 </body>
 </html>
