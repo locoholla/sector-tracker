@@ -4,53 +4,14 @@
   <meta charset="utf-8">
   <title>NASDAQ Sector Tracker</title>
 </head>
-<body>
-<!-- TradingView Widget BEGIN -->
-<div class="tradingview-widget-container">
-  <div id="tradingview_widget"></div>
-  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
-{
-  "colorTheme": "dark",
-  "dateRange": "1D",
-  "showChart": true,
-  "locale": "en",
-  "width": "100%",
-  "height": "600",
-  "tabs": [
-    {
-      "title": "Technology",
-      "symbols": [
-        { "s": "NASDAQ:AAPL" },
-        { "s": "NASDAQ:MSFT" },
-        { "s": "NASDAQ:GOOG" },
-        { "s": "NASDAQ:NVDA" },
-        { "s": "NASDAQ:ADBE" }
-      ]
-    },
-    {
-      "title": "Financials",
-      "symbols": [
-        { "s": "NASDAQ:PYPL" },
-        { "s": "NASDAQ:INTU" },
-        { "s": "NASDAQ:SQ" },
-        { "s": "NASDAQ:HOOD" },
-        { "s": "NASDAQ:SOFI" }
-      ]
-    },
-    {
-      "title": "Healthcare",
-      "symbols": [
-        { "s": "NASDAQ:AMGN" },
-        { "s": "NASDAQ:GILD" },
-        { "s": "NASDAQ:VRTX" },
-        { "s": "NASDAQ:REGN" },
-        { "s": "NASDAQ:ILMN" }
-      ]
-    }
-  ]
-}
-  </script>
-</div>
-<!-- TradingView Widget END -->
+<body style="margin:0;padding:0;background:#000;">
+  <iframe 
+    src="https://s.tradingview.com/embed-widget/market-overview/?locale=en#%7B%22colorTheme%22%3A%22dark%22%2C%22dateRange%22%3A%221D%22%2C%22showChart%22%3Atrue%2C%22width%22%3A%22100%25%22%2C%22height%22%3A%22600%22%2C%22tabs%22%3A%5B%7B%22title%22%3A%22Technology%22%2C%22symbols%22%3A%5B%7B%22s%22%3A%22NASDAQ%3AAAPL%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AMSFT%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AGOOG%22%7D%2C%7B%22s%22%3A%22NASDAQ%3ANVDA%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AADBE%22%7D%5D%7D%2C%7B%22title%22%3A%22Financials%22%2C%22symbols%22%3A%5B%7B%22s%22%3A%22NASDAQ%3APYPL%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AINTU%22%7D%2C%7B%22s%22%3A%22NASDAQ%3ASQ%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AHOOD%22%7D%2C%7B%22s%22%3A%22NASDAQ%3ASOFI%22%7D%5D%7D%2C%7B%22title%22%3A%22Healthcare%22%2C%22symbols%22%3A%5B%7B%22s%22%3A%22NASDAQ%3AAMGN%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AGILD%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AVRTX%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AREGN%22%7D%2C%7B%22s%22%3A%22NASDAQ%3AILMN%22%7D%5D%7D%5D%7D" 
+    style="border:none;" 
+    width="100%" 
+    height="600" 
+    frameborder="0"
+    allowtransparency="true">
+  </iframe>
 </body>
 </html>
