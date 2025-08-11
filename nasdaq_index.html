@@ -1,27 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>NASDAQ Sector Tracker</title>
+  <meta charset="UTF-8" />
+  <title>NASDAQ Sector Tracker - Twelve Data</title>
   <style>
     body {
       background: #111;
       color: #fff;
       font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
     }
     h1 {
       text-align: center;
+      padding: 20px;
+      color: #58a6ff;
     }
     .sector {
-      margin: 20px 0;
+      margin: 20px auto;
+      max-width: 800px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
     th, td {
-      padding: 8px;
+      padding: 10px;
       text-align: left;
     }
     th {
@@ -30,8 +34,12 @@
     tr:nth-child(even) {
       background: #1a1a1a;
     }
-    .pos { color: #4CAF50; }
-    .neg { color: #F44336; }
+    .pos {
+      color: #4caf50;
+    }
+    .neg {
+      color: #f44336;
+    }
   </style>
 </head>
 <body>
@@ -39,44 +47,63 @@
   <div id="container"></div>
 
   <script>
+    const API_KEY = "1e368e84c58f449fa393a22a62775db4";
+
+    // Define sectors with tickers (Twelve Data uses US stock symbols)
     const sectors = {
-      "Technology": ["AAPL", "MSFT", "NVDA", "GOOG", "ADBE"],
-      "Financials": ["PYPL", "INTU", "SQ", "HOOD", "SOFI"],
-      "Healthcare": ["AMGN", "GILD", "VRTX", "REGN", "ILMN"]
+      Technology: ["AAPL", "MSFT", "NVDA", "GOOG", "ADBE"],
+      Financials: ["PYPL", "INTU", "SQ", "HOOD", "SOFI"],
+      Healthcare: ["AMGN", "GILD", "VRTX", "REGN", "ILMN"]
     };
 
-    async function fetchData() {
-      document.getElementById("container").innerHTML = "";
-      for (let [sector, tickers] of Object.entries(sectors)) {
-        let url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${tickers.join(",")}`;
-        let proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
+    async function fetchSectorData() {
+      const container = document.getElementById("container");
+      container.innerHTML = ""; // Clear previous
+
+      for (const [sector, symbols] of Object.entries(sectors)) {
+        const url = `https://api.twelvedata.com/quote?symbol=${symbols.join(",")}&apikey=${API_KEY}`;
         try {
-          let res = await fetch(proxyUrl);
-          let data = await res.json();
-          let quotes = data.quoteResponse.result;
+          const res = await fetch(url);
+          const data = await res.json();
+
+          // data will have one object for single symbol or array for multiple
+          // Normalize to array for easy iteration
+          let quotes = [];
+          if (Array.isArray(data)) {
+            quotes = data;
+          } else if (data.symbol) {
+            quotes = [data];
+          } else if (data.status === "error") {
+            container.innerHTML += `<p>Error fetching data for ${sector}: ${data.message}</p>`;
+            continue;
+          } else {
+            quotes = Object.values(data);
+          }
 
           let html = `<div class="sector"><h2>${sector}</h2><table>
-                        <tr><th>Symbol</th><th>Price</th><th>Change %</th></tr>`;
+                        <tr><th>Symbol</th><th>Price (USD)</th><th>Change %</th></tr>`;
+
           quotes.forEach(q => {
-            let change = q.regularMarketChangePercent?.toFixed(2);
-            let cls = change >= 0 ? "pos" : "neg";
+            const change = parseFloat(q.percent_change).toFixed(2);
+            const cls = change >= 0 ? "pos" : "neg";
             html += `<tr>
                       <td>${q.symbol}</td>
-                      <td>${q.regularMarketPrice}</td>
+                      <td>${parseFloat(q.price).toFixed(2)}</td>
                       <td class="${cls}">${change}%</td>
                     </tr>`;
           });
-          html += "</table></div>";
 
-          document.getElementById("container").innerHTML += html;
+          html += "</table></div>";
+          container.innerHTML += html;
         } catch (err) {
-          console.error("Error fetching data for", sector, err);
+          container.innerHTML += `<p>Error fetching data for ${sector}: ${err.message}</p>`;
+          console.error(err);
         }
       }
     }
 
-    fetchData();
-    setInterval(fetchData, 60000);
+    fetchSectorData();
+    setInterval(fetchSectorData, 60000); // Refresh every 60 seconds
   </script>
 </body>
 </html>
