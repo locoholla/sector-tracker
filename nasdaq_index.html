@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>NASDAQ Sector Tracker</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #111; color: #fff; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+    th, td { padding: 8px 12px; text-align: left; }
+    th { background: #222; }
+    .up { color: #00ff00; }
+    .down { color: #ff4444; }
+    .sector-name { cursor: pointer; }
+    .stock-table { margin-left: 20px; }
+  </style>
+</head>
+<body>
+  <h2>NASDAQ Sector Tracker</h2>
+  <table id="sectorTable">
+    <thead>
+      <tr>
+        <th>Sector</th>
+        <th>Last Price</th>
+        <th>% Change</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="stocksContainer"></div>
+
+  <script>
+    const sectors = {
+      "Technology": ["AAPL", "MSFT", "NVDA", "GOOGL", "META", "AMD", "INTC"],
+      "Healthcare": ["AMGN", "GILD", "VRTX", "REGN", "BIIB", "MRNA", "ILMN"],
+      "Consumer Discretionary": ["TSLA", "AMZN", "BKNG", "SBUX", "MELI", "JD", "PDD"],
+      "Financials": ["PYPL", "CME", "SCHW", "MS", "GS", "HOOD", "COIN"],
+      "Communication Services": ["NFLX", "GOOG", "EA", "TTWO", "CHTR", "TMUS", "DISCK"]
+    };
+
+    async function fetchStock(symbol) {
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`;
+      const res = await fetch(url);
+      const json = await res.json();
+      const meta = json.chart.result[0].meta;
+      return {
+        symbol: symbol,
+        last: meta.regularMarketPrice,
+        open: meta.chartPreviousClose,
+        changePct: ((meta.regularMarketPrice - meta.chartPreviousClose) / meta.chartPreviousClose * 100).toFixed(2)
+      };
+    }
+
+    async function fetchSectorData() {
+      const tableBody = document.querySelector("#sectorTable tbody");
+      tableBody.innerHTML = "";
+
+      for (let [sector, symbols] of Object.entries(sectors)) {
+        let stockData = await Promise.all(symbols.map(s => fetchStock(s)));
+        let avgChange = stockData.reduce((a, b) => a + parseFloat(b.changePct), 0) / stockData.length;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td class="sector-name" data-sector="${sector}">${sector}</td>
+          <td>-</td>
+          <td class="${avgChange >= 0 ? 'up' : 'down'}">${avgChange.toFixed(2)}%</td>
+        `;
+        tableBody.appendChild(row);
+
+        row.addEventListener("click", () => showTopStocks(sector, stockData));
+      }
+    }
+
+    function showTopStocks(sector, stockData) {
+      const container = document.getElementById("stocksContainer");
+      container.innerHTML = `<h3>${sector} - Top 5 Movers</h3>`;
+      stockData.sort((a, b) => Math.abs(b.changePct) - Math.abs(a.changePct));
+      const top5 = stockData.slice(0, 5);
+
+      const table = document.createElement("table");
+      table.classList.add("stock-table");
+      table.innerHTML = `
+        <thead>
+          <tr><th>Symbol</th><th>Last</th><th>% Change</th></tr>
+        </thead>
+        <tbody>
+          ${top5.map(s => `
+            <tr>
+              <td>${s.symbol}</td>
+              <td>$${s.last}</td>
+              <td class="${s.changePct >= 0 ? 'up' : 'down'}">${s.changePct}%</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+      container.appendChild(table);
+    }
+
+    fetchSectorData();
+    setInterval(fetchSectorData, 60000);
+  </script>
+</body>
+</html>
