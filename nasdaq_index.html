@@ -1,90 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
   <title>NASDAQ Sector Tracker</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0d1117;
-      color: white;
-      margin: 0;
-      padding: 0;
-    }
-    h1 {
-      text-align: center;
-      padding: 20px;
-      color: #58a6ff;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
-    .widget-container {
-      background: #161b22;
-      border-radius: 8px;
-      padding: 10px;
-    }
-  </style>
 </head>
 <body>
-
-<h1>NASDAQ Sector Tracker</h1>
-
-<div class="grid">
-  <div class="widget-container">
-    <h3>NASDAQ 100</h3>
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
-      {
-        "colorTheme": "dark",
-        "dateRange": "1D",
-        "showChart": true,
-        "locale": "en",
-        "width": "100%",
-        "height": "400",
-        "tabs": [
-          {
-            "title": "Technology",
-            "symbols": [
-              { "s": "NASDAQ:AAPL" },
-              { "s": "NASDAQ:MSFT" },
-              { "s": "NASDAQ:GOOG" },
-              { "s": "NASDAQ:NVDA" },
-              { "s": "NASDAQ:ADBE" }
-            ]
-          },
-          {
-            "title": "Financials",
-            "symbols": [
-              { "s": "NASDAQ:PYPL" },
-              { "s": "NASDAQ:INTU" },
-              { "s": "NASDAQ:SQ" },
-              { "s": "NASDAQ:HOOD" },
-              { "s": "NASDAQ:SOFI" }
-            ]
-          },
-          {
-            "title": "Healthcare",
-            "symbols": [
-              { "s": "NASDAQ:AMGN" },
-              { "s": "NASDAQ:GILD" },
-              { "s": "NASDAQ:VRTX" },
-              { "s": "NASDAQ:REGN" },
-              { "s": "NASDAQ:ILMN" }
-            ]
-          }
-        ]
-      }
-      </script>
-    </div>
-  </div>
+<!-- TradingView Widget BEGIN -->
+<div class="tradingview-widget-container">
+  <div id="tradingview_widget"></div>
+  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+{
+  "colorTheme": "dark",
+  "dateRange": "1D",
+  "showChart": true,
+  "locale": "en",
+  "width": "100%",
+  "height": "600",
+  "tabs": [
+    {
+      "title": "Technology",
+      "symbols": [
+        { "s": "NASDAQ:AAPL" },
+        { "s": "NASDAQ:MSFT" },
+        { "s": "NASDAQ:GOOG" },
+        { "s": "NASDAQ:NVDA" },
+        { "s": "NASDAQ:ADBE" }
+      ]
+    },
+    {
+      "title": "Financials",
+      "symbols": [
+        { "s": "NASDAQ:PYPL" },
+        { "s": "NASDAQ:INTU" },
+        { "s": "NASDAQ:SQ" },
+        { "s": "NASDAQ:HOOD" },
+        { "s": "NASDAQ:SOFI" }
+      ]
+    },
+    {
+      "title": "Healthcare",
+      "symbols": [
+        { "s": "NASDAQ:AMGN" },
+        { "s": "NASDAQ:GILD" },
+        { "s": "NASDAQ:VRTX" },
+        { "s": "NASDAQ:REGN" },
+        { "s": "NASDAQ:ILMN" }
+      ]
+    }
+  ]
+}
+  </script>
 </div>
-
+<!-- TradingView Widget END -->
 </body>
 </html>
-
