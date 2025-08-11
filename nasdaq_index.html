@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>NASDAQ Sector Tracker - Twelve Data</title>
+  <title>NASDAQ Sector Tracker - Finnhub</title>
   <style>
     body {
       background: #111;
@@ -43,62 +43,58 @@
   </style>
 </head>
 <body>
-  <h1>NASDAQ Sector Tracker</h1>
+  <h1>NASDAQ Sector Tracker (Finnhub)</h1>
   <div id="container"></div>
 
   <script>
-    const API_KEY = "1e368e84c58f449fa393a22a62775db4";
+    const API_KEY = "d2d75b9r01qjem5jdkm0d2d75b9r01qjem5jdkmg";
 
-    // Define sectors with tickers (Twelve Data uses US stock symbols)
+    // Define sectors with tickers
     const sectors = {
       Technology: ["AAPL", "MSFT", "NVDA", "GOOG", "ADBE"],
       Financials: ["PYPL", "INTU", "SQ", "HOOD", "SOFI"],
       Healthcare: ["AMGN", "GILD", "VRTX", "REGN", "ILMN"]
     };
 
+    async function fetchQuote(symbol) {
+      const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error("Error fetching quote for", symbol, error);
+        return null;
+      }
+    }
+
     async function fetchSectorData() {
       const container = document.getElementById("container");
-      container.innerHTML = ""; // Clear previous
+      container.innerHTML = "";
 
       for (const [sector, symbols] of Object.entries(sectors)) {
-        const url = `https://api.twelvedata.com/quote?symbol=${symbols.join(",")}&apikey=${API_KEY}`;
-        try {
-          const res = await fetch(url);
-          const data = await res.json();
+        let html = `<div class="sector"><h2>${sector}</h2><table>
+                      <tr><th>Symbol</th><th>Price (USD)</th><th>Change %</th></tr>`;
 
-          // data will have one object for single symbol or array for multiple
-          // Normalize to array for easy iteration
-          let quotes = [];
-          if (Array.isArray(data)) {
-            quotes = data;
-          } else if (data.symbol) {
-            quotes = [data];
-          } else if (data.status === "error") {
-            container.innerHTML += `<p>Error fetching data for ${sector}: ${data.message}</p>`;
-            continue;
-          } else {
-            quotes = Object.values(data);
-          }
-
-          let html = `<div class="sector"><h2>${sector}</h2><table>
-                        <tr><th>Symbol</th><th>Price (USD)</th><th>Change %</th></tr>`;
-
-          quotes.forEach(q => {
-            const change = parseFloat(q.percent_change).toFixed(2);
-            const cls = change >= 0 ? "pos" : "neg";
+        // Fetch quotes for all symbols in sector sequentially
+        for (const symbol of symbols) {
+          const quote = await fetchQuote(symbol);
+          if (quote && quote.c && quote.pc) {
+            const changePercent = ((quote.c - quote.pc) / quote.pc) * 100;
+            const cls = changePercent >= 0 ? "pos" : "neg";
             html += `<tr>
-                      <td>${q.symbol}</td>
-                      <td>${parseFloat(q.price).toFixed(2)}</td>
-                      <td class="${cls}">${change}%</td>
+                      <td>${symbol}</td>
+                      <td>${quote.c.toFixed(2)}</td>
+                      <td class="${cls}">${changePercent.toFixed(2)}%</td>
                     </tr>`;
-          });
-
-          html += "</table></div>";
-          container.innerHTML += html;
-        } catch (err) {
-          container.innerHTML += `<p>Error fetching data for ${sector}: ${err.message}</p>`;
-          console.error(err);
+          } else {
+            html += `<tr><td>${symbol}</td><td colspan="2">Data unavailable</td></tr>`;
+          }
         }
+
+        html += "</table></div>";
+        container.innerHTML += html;
       }
     }
 
