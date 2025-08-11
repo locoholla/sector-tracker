@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>NASDAQ Sector Tracker - Finnhub</title>
+  <title>NASDAQ Sector Tracker - Finnhub + CORS Proxy</title>
   <style>
     body {
       background: #111;
@@ -43,13 +43,12 @@
   </style>
 </head>
 <body>
-  <h1>NASDAQ Sector Tracker (Finnhub)</h1>
+  <h1>NASDAQ Sector Tracker (Finnhub + CORS Proxy)</h1>
   <div id="container"></div>
 
   <script>
     const API_KEY = "d2d75b9r01qjem5jdkm0d2d75b9r01qjem5jdkmg";
 
-    // Define sectors with tickers
     const sectors = {
       Technology: ["AAPL", "MSFT", "NVDA", "GOOG", "ADBE"],
       Financials: ["PYPL", "INTU", "SQ", "HOOD", "SOFI"],
@@ -58,8 +57,9 @@
 
     async function fetchQuote(symbol) {
       const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`;
+      const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
       try {
-        const response = await fetch(url);
+        const response = await fetch(proxyUrl);
         if (!response.ok) throw new Error(`HTTP error ${response.status}`);
         const data = await response.json();
         return data;
@@ -77,7 +77,6 @@
         let html = `<div class="sector"><h2>${sector}</h2><table>
                       <tr><th>Symbol</th><th>Price (USD)</th><th>Change %</th></tr>`;
 
-        // Fetch quotes for all symbols in sector sequentially
         for (const symbol of symbols) {
           const quote = await fetchQuote(symbol);
           if (quote && quote.c && quote.pc) {
@@ -99,7 +98,7 @@
     }
 
     fetchSectorData();
-    setInterval(fetchSectorData, 60000); // Refresh every 60 seconds
+    setInterval(fetchSectorData, 60000);
   </script>
 </body>
 </html>
