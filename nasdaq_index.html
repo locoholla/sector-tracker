@@ -39,7 +39,6 @@
   <div id="container"></div>
 
   <script>
-    // Define sectors with tickers
     const sectors = {
       "Technology": ["AAPL", "MSFT", "NVDA", "GOOG", "ADBE"],
       "Financials": ["PYPL", "INTU", "SQ", "HOOD", "SOFI"],
@@ -50,8 +49,9 @@
       document.getElementById("container").innerHTML = "";
       for (let [sector, tickers] of Object.entries(sectors)) {
         let url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${tickers.join(",")}`;
+        let proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
         try {
-          let res = await fetch(url);
+          let res = await fetch(proxyUrl);
           let data = await res.json();
           let quotes = data.quoteResponse.result;
 
@@ -76,7 +76,7 @@
     }
 
     fetchData();
-    setInterval(fetchData, 60000); // update every 60s
+    setInterval(fetchData, 60000);
   </script>
 </body>
 </html>
